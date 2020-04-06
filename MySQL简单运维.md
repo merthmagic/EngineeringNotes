@@ -36,6 +36,8 @@ SHOW VARIABLES LIKE 'character%';
 SHOW VARIABLES LIKE 'collation_%';
 /*查看时区*/
 SHOW VARIABLES LIKE "%time_zone%";
+/*查看当前默认存储引擎*/
+SHOW VARIABLES like "default_storage_engine";
 ```
 
 ### 查询当前连接 信息
