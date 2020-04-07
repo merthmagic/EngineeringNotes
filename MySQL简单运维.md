@@ -97,7 +97,7 @@ select * from yourtable where id=1 lock in share mode;
 select * from yourtable where id=1 for update;
 ```
 
-### 意向锁
+#### 意向锁
 
 `意向锁` 英文原文 `Intention Lock` 是表级锁，获得S锁或者X锁之前，必须先获得意向锁
 
@@ -113,3 +113,15 @@ select * from yourtable where id=1 for update;
 ```
 
 TIP：意向锁是表级别的，用来防止有行级锁的情况下还去获得表级锁，行级锁申请意向锁不冲突，如果冲突，那一个表就只有一个行级锁了，这和行级锁的定义不符合
+
+#### 行级锁
+
+行级锁的实现有三种，`Record Locks`,`Gap Locks ` `Next-Key Locks`, 其中 Next-Key Locks是Record Locks和Gap Locks的结合.
+
+> A record lock is a lock on an index record. For example, `SELECT c1 FROM t WHERE c1 = 10 FOR UPDATE;` prevents any other transaction from inserting, updating, or deleting rows where the value of `t.c1` is `10`.
+>
+> A gap lock is a lock on a gap between index records, or a lock on the gap before the first or after the last index record. For example, `SELECT c1 FROM t WHERE c1 BETWEEN 10 and 20 FOR UPDATE;` prevents other transactions from inserting a value of `15` into column `t.c1`, whether or not there was already any such value in the column, because the gaps between all existing values in the range are locked.
+>
+> A next-key lock is a combination of a record lock on the index record and a gap lock on the gap before the index record.
+
+详细需要参考 https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html
