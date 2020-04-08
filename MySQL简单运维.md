@@ -125,3 +125,8 @@ TIP：意向锁是表级别的，用来防止有行级锁的情况下还去获�
 > A next-key lock is a combination of a record lock on the index record and a gap lock on the gap before the index record.
 
 详细需要参考 https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html
+
+**什么时候会加锁**
+
+> A [locking read](https://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_locking_read), an [`UPDATE`](https://dev.mysql.com/doc/refman/5.6/en/update.html), or a [`DELETE`](https://dev.mysql.com/doc/refman/5.6/en/delete.html) generally set record locks on every index record that is scanned in the processing of the SQL statement. It does not matter whether there are `WHERE` conditions in the statement that would exclude the row. `InnoDB` does not remember the exact `WHERE` condition, but only knows which index ranges were scanned. The locks are normally [next-key locks](https://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_next_key_lock) that also block inserts into the “gap” immediately before the record. However, [gap locking](https://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_gap_lock) can be disabled explicitly, which causes next-key locking not to be used. 
+
