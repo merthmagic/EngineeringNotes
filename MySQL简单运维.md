@@ -130,3 +130,51 @@ TIP：意向锁是表级别的，用来防止有行级锁的情况下还去获�
 
 > A [locking read](https://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_locking_read), an [`UPDATE`](https://dev.mysql.com/doc/refman/5.6/en/update.html), or a [`DELETE`](https://dev.mysql.com/doc/refman/5.6/en/delete.html) generally set record locks on every index record that is scanned in the processing of the SQL statement. It does not matter whether there are `WHERE` conditions in the statement that would exclude the row. `InnoDB` does not remember the exact `WHERE` condition, but only knows which index ranges were scanned. The locks are normally [next-key locks](https://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_next_key_lock) that also block inserts into the “gap” immediately before the record. However, [gap locking](https://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_gap_lock) can be disabled explicitly, which causes next-key locking not to be used. 
 
+### 事务
+
+#### 幻读
+
+> [Origin Link](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/phantom-read.html#)
+>
+> **Phantom read**
+>
+> A Phantom read occurs when one user is repeating a read operation on the same records, but has new records in the results set:
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)READ UNCOMMITTED
+>
+> Also called a Dirty read. When this isolation level is used, a transaction can read uncommitted data that later may be rolled back. A transaction that uses this isolation level can only fetch data but can't update, delete, or insert data.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)READ COMMITTED
+>
+> With this isolation level, Dirty reads are not possible, but if the same row is read repeatedly during the same transaction, its contents may be changed or the entire row may be deleted by other transactions.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)REPEATABLE READ
+>
+> This isolation level guarantees that a transaction can read the same row many times and it will remain intact. However, if a query with the same search criteria (the same WHERE clause) is executed more than once, each execution may return different set of rows. This may happen because other transactions are allowed to insert new rows that satisfy the search criteria or update some rows in such way that they now satisfy the search criteria.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)SERIALIZABLE
+>
+> This isolation level guarantees that none of the above happens. In addition, it guarantees that transactions that use this level will be completely isolated from other transactions.
+>
+> Based on this information, we can provide basic guidelines for choosing the proper isolation level for the ODBC connection that is going to be used by Crystal Reports:
+>
+> READ UNCOMMITTED should be used with reports that do not rely on data accuracy. Usually these same reports also process/access a high number of records. This optimizes performance while executing your report with a minimum number of database locks. Examples of reports in this category:
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)Statistical information at the end of a month.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)Sales report covering a previous year.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)Reports running daily that accesses data which is rarely updated.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)Reports running daily if the values displayed are only used as indicators.
+>
+> COMMITTED READ should be used with reports running daily on data that is frequently modified. This enables good performance while executing reports on a "live" database with an average number of record locks that are immediately released. Examples of reports in this category include:
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)Daily reports on regularly updated data requiring 100 percent accuracy at the time the report is processed.
+>
+> ![*](https://documentation.progress.com/output/ua/OpenEdge_latest/rpcry/bullet.png)Reports that provide snapshots of an operation at any time during the day. Such reports are used for monitoring purposes, such as stock exchange status reports.
+>
+> REPEATABLE READ and SERIALIZABLE should not be used with reports as they do not add value at the time the report is generated, especially when compared to COMMITTED READ.
+>
+> Having reviewed the transaction isolation levels, you can now configure your ODBC driver.
+
